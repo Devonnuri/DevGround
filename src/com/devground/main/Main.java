@@ -40,7 +40,6 @@ public class Main implements Runnable {
 
     World world;
     TileRenderer tileRenderer;
-    Player player;
 
     Window window = new Window(width, height);
 
@@ -104,11 +103,9 @@ public class Main implements Runnable {
         camera.setPosition(new Vector3f(0, 0, 0));
         shader = new Shader("shader");
 
+        Entity.initModel();
         world = new World("test");
         tileRenderer = new TileRenderer(world);
-
-        Entity.initModel();
-        player = new Player(world);
     }
 
     private void update() {
@@ -116,7 +113,7 @@ public class Main implements Runnable {
             window.close();
         }
 
-        player.update(FPS, window, camera);
+        world.update(FPS, window, camera);
 
         world.correctCamera(camera, window);
         window.update();
@@ -126,7 +123,6 @@ public class Main implements Runnable {
         glClear(GL_COLOR_BUFFER_BIT);
 
         world.render(tileRenderer, window, shader, camera);
-        player.render(shader, camera);
 
         window.swapBuffers();
         fpsCounter.update();

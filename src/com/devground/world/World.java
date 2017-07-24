@@ -1,6 +1,8 @@
 package com.devground.world;
 
 import com.devground.collision.CollisionBox;
+import com.devground.entity.Entity;
+import com.devground.entity.Player;
 import com.devground.exception.GameException;
 import com.devground.Window;
 import com.devground.render.Camera;
@@ -16,6 +18,7 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.util.ArrayList;
 
 public class World {
     private String name;
@@ -27,6 +30,7 @@ public class World {
     public boolean[] tilesSolid;
 
     private CollisionBox[] collisionBoxes;
+    private ArrayList<Entity> entities;
 
     private final int viewRange = 60;
 
@@ -58,6 +62,7 @@ public class World {
             this.world = new Matrix4f()
                     .setTranslation(new Vector3f(0))
                     .scale(scale);
+            this.entities = new ArrayList<>();
 
             if(!NullCheck.isNull(root.getAttribute("fill")))
                 fillTile(Tile.getTile(root.getAttribute("fill")));
@@ -88,23 +93,8 @@ public class World {
         } else {
             throw new GameException("맵의 Root인 world 태그가 없습니다.");
         }
-    }
 
-    public World(int width, int height) {
-        this(width, height, 20);
-    }
-
-    public World(int width, int height, int scale) {
-        this.tiles = new int[width*height];
-        this.tilesSolid = new boolean[width*height];
-        this.width = width;
-        this.height = height;
-        this.world = new Matrix4f()
-                .setTranslation(new Vector3f(0))
-                .scale(scale);
-        this.scale = scale;
-
-        this.collisionBoxes = new CollisionBox[width * height];
+        this.entities.add(new Player(this));
     }
 
     public void render(TileRenderer renderer, Window window, Shader shader, Camera camera) {
@@ -120,6 +110,16 @@ public class World {
                 if(tile != null)
                     renderer.render(tile, x-posX, -y-posY, shader, world, camera);
             }
+        }
+
+        for(Entity entity : entities) {
+            entity.render(this, shader, camera);
+        }
+    }
+
+    public void update(double fps, Window window, Camera camera) {
+        for(Entity entity : entities) {
+            entity.update(fps, window, camera);
         }
     }
 
