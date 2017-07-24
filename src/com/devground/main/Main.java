@@ -107,7 +107,7 @@ public class Main implements Runnable {
         world = new World("test");
         tileRenderer = new TileRenderer(world);
 
-        //Entity.initModel();
+        Entity.initModel();
         player = new Player(world);
     }
 
@@ -133,7 +133,7 @@ public class Main implements Runnable {
     }
 
     private void close() {
-        //Entity.removeModel();
+        Entity.removeModel();
         glfwTerminate();
     }
 

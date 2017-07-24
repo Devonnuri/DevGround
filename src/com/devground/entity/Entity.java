@@ -12,7 +12,7 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 public class Entity {
-    private Model model;
+    private static Model model;
     //private Texture texture;
     private Animation texture;
     private Transform transform;
@@ -21,27 +21,6 @@ public class Entity {
     private CollisionBox collisionBox;
 
     public Entity(World world, Animation animation, Transform transform) {
-        float[] vertices = new float[] {
-                -1f, 1f, 0, //TOP LEFT     0
-                1f, 1f, 0,  //TOP RIGHT    1
-                1f, -1f, 0, //BOTTOM RIGHT 2
-                -1f, -1f, 0,//BOTTOM LEFT  3
-        };
-
-        float[] texture = new float[] {
-                0,0,
-                1,0,
-                1,1,
-                0,1,
-        };
-
-        int[] indices = new int[] {
-                0,1,2,
-                2,3,0
-        };
-
-        model = new Model(vertices, texture, indices);
-
         this.world = world;
         this.texture = animation;
 
@@ -74,7 +53,7 @@ public class Entity {
                 int posX = (int) transform.pos.x/2 + x;
                 int posY = (int) -transform.pos.y/2 + y;
 
-                if(posY >= world.width || posX >= world.height || posX < 0 || posY < 0) continue;
+                if(posX >= world.width || posY >= world.height || posX < 0 || posY < 0) continue;
 
                 boxes[y*5+x] = world.getCollisionBox(posX, posY);
             }
@@ -132,30 +111,30 @@ public class Entity {
         model.render();
     }
 
-//    public static void initModel() {
-//        float[] vertices = new float[] {
-//                -1f, 1f, 0, //TOP LEFT     0
-//                1f, 1f, 0,  //TOP RIGHT    1
-//                1f, -1f, 0, //BOTTOM RIGHT 2
-//                -1f, -1f, 0,//BOTTOM LEFT  3
-//        };
-//
-//        float[] texture = new float[] {
-//                0,0,
-//                1,0,
-//                1,1,
-//                0,1,
-//        };
-//
-//        int[] indices = new int[] {
-//                0,1,2,
-//                2,3,0
-//        };
-//
-//        model = new Model(vertices, texture, indices);
-//    }
-//
-//    public static void removeModel() {
-//        model = null;
-//    }
+    public static void initModel() {
+        float[] vertices = new float[] {
+                -1f, 1f, 0, //TOP LEFT     0
+                1f, 1f, 0,  //TOP RIGHT    1
+                1f, -1f, 0, //BOTTOM RIGHT 2
+                -1f, -1f, 0,//BOTTOM LEFT  3
+        };
+
+        float[] texture = new float[] {
+                0,0,
+                1,0,
+                1,1,
+                0,1,
+        };
+
+        int[] indices = new int[] {
+                0,1,2,
+                2,3,0
+        };
+
+        model = new Model(vertices, texture, indices);
+    }
+
+    public static void removeModel() {
+        model = null;
+    }
 }
