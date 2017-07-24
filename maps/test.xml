@@ -1,0 +1,6 @@
+<world name="abc" width="30" height="30" fill="grass" scale="20">
+    <tile x="2" y="2" material="stone" solid="false"/>
+    <tile x="3" y="2" material="stone" solid="true"/>
+    <tile x="4" y="2" material="stone" solid="false"/>
+    <tile x="5" y="2" material="stone" solid="false"/>
+</world>
