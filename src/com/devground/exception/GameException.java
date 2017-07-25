@@ -1,9 +1,9 @@
 package com.devground.exception;
 
-import sun.plugin.dom.exception.InvalidStateException;
+import org.w3c.dom.DOMException;
 
-public class GameException extends InvalidStateException {
+public class GameException extends DOMException {
     public GameException(String msg, Object... args) {
-        super(String.format(msg, args));
+        super(INVALID_STATE_ERR, String.format(msg, args));
     }
 }

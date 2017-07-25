@@ -69,7 +69,7 @@ public class Main implements Runnable {
             startTime = Timer.getTime();
 
             while(unprocessed >= frameDelay) {
-                unprocessed -= frameDelay;
+                unprocessed = 0;
                 canRender = true;
 
                 update();
@@ -95,6 +95,9 @@ public class Main implements Runnable {
         GL.createCapabilities();
         glEnable(GL_TEXTURE_2D);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
 
         fpsCounter = new FPSCounter();
@@ -104,11 +107,19 @@ public class Main implements Runnable {
         shader = new Shader("shader");
 
         Entity.initModel();
-        world = new World("test");
+        world = new World("test", camera);
+        world.calculateViewRange(window);
+
         tileRenderer = new TileRenderer(world);
     }
 
     private void update() {
+        if(window.isResized()) {
+            camera.setProjection(window.getWidth(), window.getHeight());
+            world.calculateViewRange(window);
+            glViewport(0, 0, window.getWidth(), window.getHeight());
+        }
+
         if(window.getInput().isKeyPressed(GLFW_KEY_ESCAPE)) {
             window.close();
         }
@@ -122,7 +133,7 @@ public class Main implements Runnable {
     private void render() {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        world.render(tileRenderer, window, shader, camera);
+        world.render(tileRenderer, shader, camera);
 
         window.swapBuffers();
         fpsCounter.update();

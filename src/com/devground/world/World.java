@@ -1,5 +1,6 @@
 package com.devground.world;
 
+import com.devground.Transform;
 import com.devground.collision.CollisionBox;
 import com.devground.entity.Entity;
 import com.devground.entity.Player;
@@ -32,9 +33,10 @@ public class World {
     private CollisionBox[] collisionBoxes;
     private ArrayList<Entity> entities;
 
+    private int viewRangeX, viewRangeY;
     private final int viewRange = 60;
 
-    public World(String name) {
+    public World(String name, Camera camera) {
         this.name = name;
 
         File file = new File("./maps/"+name+".xml");
@@ -72,12 +74,12 @@ public class World {
             NodeList nodeList = root.getElementsByTagName("tile");
             for(int i=0; i<nodeList.getLength(); i++) {
                 if(nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    Element tile = (Element) nodeList.item(i);
-
-                    String x = tile.getAttribute("x");
-                    String y = tile.getAttribute("y");
-                    String material = tile.getAttribute("material");
-                    String solid = tile.getAttribute("solid");
+                    Element element = (Element) nodeList.item(i);
+                    System.out.println(element.getNodeName());
+                    String x = element.getAttribute("x");
+                    String y = element.getAttribute("y");
+                    String material = element.getAttribute("material");
+                    String solid = element.getAttribute("solid");
 
                     if(NullCheck.isNull(x) || NullCheck.isNull(y)) continue;
 
@@ -94,21 +96,40 @@ public class World {
             throw new GameException("맵의 Root인 world 태그가 없습니다.");
         }
 
-        this.entities.add(new Player(this));
+        NodeList nodeList = root.getElementsByTagName("player");
+        for(int i=0; i<nodeList.getLength(); i++) {
+            if(nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) nodeList.item(i);
+
+                String x = (String) NullCheck.setDefault(element.getAttribute("x"), 0);
+                String y = (String) NullCheck.setDefault(element.getAttribute("y"), 0);
+                System.out.println(x+", "+y);
+
+                Transform transform = new Transform();
+                transform.pos.x = Integer.parseInt(x)*2;
+                transform.pos.y = -Integer.parseInt(y)*2;
+
+                Player player = new Player(this, transform);
+                this.entities.add(player);
+                camera.getPosition().set(transform.pos.mul(-scale, new Vector3f()));
+            }
+        }
     }
 
-    public void render(TileRenderer renderer, Window window, Shader shader, Camera camera) {
-        int posX = ((int) camera.getPosition().x + (window.getWidth()/2)) / (scale * 2);
-        int posY = ((int) camera.getPosition().y - (window.getHeight()/2)) / (scale * 2);
+    public void render(TileRenderer renderer, Shader shader, Camera camera) {
+        int posX = (int) camera.getPosition().x / (scale * 2);
+        int posY = (int) camera.getPosition().y / (scale * 2);
 
-        for(int x = 0; x < viewRange; x++) {
-            for(int y = 0; y < viewRange; y++) {
-                if(y+posY >= height || x-posX >= width) continue;
+        for(int x = 0; x < viewRangeX; x++) {
+            for(int y = 0; y < viewRangeY; y++) {
+                int tx = x-posX-(viewRangeX/2)+1;
+                int ty = y+posY-(viewRangeY/2);
+                if(tx >= height || ty >= width || tx < 0 || ty < 0) continue;
 
-                Tile tile = getTile(x-posX, y+posY);
+                Tile tile = getTile(tx, ty);
 
                 if(tile != null)
-                    renderer.render(tile, x-posX, -y-posY, shader, world, camera);
+                    renderer.render(tile, tx, -y-posY+(viewRangeY/2), shader, world, camera);
             }
         }
 
@@ -120,6 +141,13 @@ public class World {
     public void update(double fps, Window window, Camera camera) {
         for(Entity entity : entities) {
             entity.update(fps, window, camera);
+
+            entity.correctPosition(this);
+            //TODO: 가까운 플레이어에게만 충돌처리를 할 수 있게 만들어야 합니다. (REASON: WASTE RESOURCES)
+            for(Entity targetEntity : entities) {
+                if(entity == targetEntity) continue;
+                entity.collideWithEntity(targetEntity);
+            }
         }
     }
 
@@ -141,6 +169,11 @@ public class World {
             pos.y = (winH/2) - scale;
         if(pos.y > h - (winH/2) - scale)    // 아랫면 넘어가는 것 방지
             pos.y = h - (winH/2) - scale;
+    }
+
+    public void calculateViewRange(Window window) {
+        viewRangeX = (window.getWidth() / (scale * 2)) + 4;
+        viewRangeY = (window.getHeight() / (scale * 2)) + 4;
     }
 
     public void setTile(int index, Tile material) {

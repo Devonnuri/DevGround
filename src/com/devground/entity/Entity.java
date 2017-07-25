@@ -9,20 +9,21 @@ import com.devground.world.World;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
 
-public class Entity {
+public abstract class Entity {
     private static Model model;
-    //private Texture texture;
-    private Animation texture;
+    private Animation[] animations;
+    private int currentAnimation;
     protected Transform transform;
     protected World world;
 
     private CollisionBox collisionBox;
 
-    public Entity(World world, Animation animation, Transform transform) {
+    public Entity(World world, int maxAnimation, Transform transform) {
         this.world = world;
-        this.texture = animation;
+
+        this.animations = new Animation[maxAnimation];
+        this.currentAnimation = 0;
 
         this.transform = transform;
         this.transform.scale = new Vector3f(1, 1, 1);
@@ -30,9 +31,7 @@ public class Entity {
         this.collisionBox = new CollisionBox(new Vector2f(transform.pos.x, transform.pos.y), new Vector2f(transform.scale.x, transform.scale.y));
     }
 
-    public void update(double fps, Window window, Camera camera) {
-        correctPosition(world);
-    }
+    public abstract void update(double fps, Window window, Camera camera);
 
     public void render(World world, Shader shader, Camera camera) {
         this.world = world;
@@ -40,7 +39,7 @@ public class Entity {
         shader.bind();
         shader.setUniformVariable("sampler", 0);
         shader.setUniformVariable("projection", transform.getProjection(camera.getProjection().mul(world.getWorldMatrix(), new Matrix4f())));
-        texture.bind(0);
+        animations[currentAnimation].bind(0);
         model.render();
     }
 
@@ -50,8 +49,16 @@ public class Entity {
     }
 
     public void setPosition(Vector2f coord) {
-        transform.pos.set(new Vector3f(coord, 0));
+        transform.pos.set(coord, 0);
         collisionBox.getCenter().set(transform.pos.x, transform.pos.y);
+    }
+
+    protected void initAnimation(int index, Animation animation) {
+        animations[index] = animation;
+    }
+
+    public void useAnimation(int index) {
+        this.currentAnimation = index;
     }
 
     public void correctPosition(World world) {
@@ -109,6 +116,21 @@ public class Entity {
         if(transform.pos.y > 0) transform.pos.y = 0;
         if(transform.pos.x > world.width*2-2) transform.pos.x = world.width*2-2;
         if(transform.pos.y < -world.width*2+2) transform.pos.y = -world.width*2+2;
+    }
+
+    public void collideWithEntity(Entity entity) {
+        Collision collision = collisionBox.getCollision(entity.collisionBox);
+
+        if(collision.isCollide) {
+            collision.distance.x /= 2;
+            collision.distance.y /= 2;
+
+            collisionBox.correctPosition(entity.collisionBox, collision);
+            transform.pos.set(collisionBox.getCenter().x, collisionBox.getCenter().y, 0);
+
+            entity.collisionBox.correctPosition(collisionBox, collision);
+            entity.transform.pos.set(entity.collisionBox.getCenter().x, entity.collisionBox.getCenter().y, 0);
+        }
     }
 
     public static void initModel() {

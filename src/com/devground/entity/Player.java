@@ -9,8 +9,18 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 public class Player extends Entity {
+    public static final int ANIM_IDLE = 0;
+    public static final int ANIM_WALK = 1;
+    public static final int ANIM_SIZE = 2;
+
     public Player(World world) {
-        super(world, new Animation(16, 10, "Pointer_Normal"), new Transform());
+        this(world, new Transform());
+    }
+
+    public Player(World world, Transform transform) {
+        super(world, ANIM_SIZE, transform);
+        initAnimation(ANIM_IDLE, new Animation(1, 10, "Pointer_Normal/idle"));
+        initAnimation(ANIM_WALK, new Animation(15, 10, "Pointer_Normal/walk"));
     }
 
     @Override
@@ -19,17 +29,19 @@ public class Player extends Entity {
 
         Vector2f movement = new Vector2f();
         if(window.getInput().isKeyDown(GLFW.GLFW_KEY_A))
-            movement.add(-8*delta, 0);
+            movement.add(-10*delta, 0);
         if(window.getInput().isKeyDown(GLFW.GLFW_KEY_D))
-            movement.add(8*delta, 0);
+            movement.add(10*delta, 0);
         if(window.getInput().isKeyDown(GLFW.GLFW_KEY_W))
-            movement.add(0, 8*delta);
+            movement.add(0, 10*delta);
         if(window.getInput().isKeyDown(GLFW.GLFW_KEY_S))
-            movement.add(0, -8*delta);
-
+            movement.add(0, -10*delta);
         addPosition(movement);
 
-        super.update(fps, window, camera);
+        if(movement.x != 0 || movement.y != 0)
+            useAnimation(ANIM_WALK);
+        else
+            useAnimation(ANIM_IDLE);
 
         camera.getPosition().lerp(transform.pos.mul(-world.getScale(), new Vector3f()), 0.05f);
     }

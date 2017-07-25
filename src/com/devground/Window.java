@@ -5,14 +5,16 @@ import com.devground.input.Input;
 import org.lwjgl.glfw.*;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.Callbacks.*;
 
 public class Window {
     private long window;
 
     private int width;
     private int height;
-
     private boolean isFullscreen = false;
+    private boolean isResized = false;
+    private GLFWWindowSizeCallback windowSizeCallback;
 
     private Input input;
 
@@ -42,11 +44,18 @@ public class Window {
             setPosition((vidMode.width() - width)/2, (vidMode.height() - height)/2);
             glfwShowWindow(window);
         }
+
+        setCallabcks();
     }
 
     public void update() {
+        isResized = false;
         input.update();
         glfwPollEvents();
+    }
+
+    public void cleanUp() {
+        glfwFreeCallbacks(window);
     }
 
     public void close() {
@@ -86,38 +95,39 @@ public class Window {
         glfwSetWindowMonitor(window, monitor, x, y, w, h, vidMode.refreshRate());
     }
 
+    private void setCallabcks() {
+        windowSizeCallback = new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(long argWindow, int argWidth, int argHeight) {
+                window = argWindow;
+                width = argWidth;
+                height = argHeight;
+                isResized = true;
+            }
+        };
+
+        glfwSetWindowSizeCallback(window, windowSizeCallback);
+    }
+
     public void setPosition(int x, int y) {
         glfwSetWindowPos(window, x, y);
-    }
-
-    public void setKeyboardCallback(GLFWKeyCallbackI callback) {
-        glfwSetKeyCallback(window, callback);
-    }
-
-    public void setCursorPosCallback(GLFWCursorPosCallbackI callback) {
-        glfwSetCursorPosCallback(window, callback);
-    }
-
-    public void setMouseButtonCallback(GLFWMouseButtonCallbackI callback) {
-        glfwSetMouseButtonCallback(window, callback);
     }
 
     public long getID() {
         return window;
     }
-
     public int getWidth() {
         return width;
     }
-
     public int getHeight() {
         return height;
     }
-
     public boolean getFullscreen() {
         return isFullscreen;
     }
-
+    public boolean isResized() {
+        return isResized;
+    }
     public Input getInput() {
         return input;
     }
