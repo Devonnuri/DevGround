@@ -5,13 +5,13 @@ import com.devground.Window;
 import com.devground.collision.Collision;
 import com.devground.collision.CollisionBox;
 import com.devground.render.*;
+import com.devground.utils.Utils;
 import com.devground.world.World;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public abstract class Entity {
-    private static Model model;
     private Animation[] animations;
     private int currentAnimation;
     protected Transform transform;
@@ -40,7 +40,7 @@ public abstract class Entity {
         shader.setUniformVariable("sampler", 0);
         shader.setUniformVariable("projection", transform.getProjection(camera.getProjection().mul(world.getWorldMatrix(), new Matrix4f())));
         animations[currentAnimation].bind(0);
-        model.render();
+        Utils.getModel().render();
     }
 
     public void addPosition(Vector2f amount) {
@@ -131,32 +131,5 @@ public abstract class Entity {
             entity.collisionBox.correctPosition(collisionBox, collision);
             entity.transform.pos.set(entity.collisionBox.getCenter().x, entity.collisionBox.getCenter().y, 0);
         }
-    }
-
-    public static void initModel() {
-        float[] vertices = new float[] {
-                -1f, 1f, 0,     //TOP LEFT     0
-                1f, 1f, 0,      //TOP RIGHT    1
-                1f, -1f, 0,     //BOTTOM RIGHT 2
-                -1f, -1f, 0,    //BOTTOM LEFT  3
-        };
-
-        float[] texture = new float[] {
-                0,0,
-                1,0,
-                1,1,
-                0,1,
-        };
-
-        int[] indices = new int[] {
-                0,1,2,
-                2,3,0
-        };
-
-        model = new Model(vertices, texture, indices);
-    }
-
-    public static void removeModel() {
-        model = null;
     }
 }

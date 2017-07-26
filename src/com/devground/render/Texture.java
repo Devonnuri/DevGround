@@ -1,12 +1,15 @@
 package com.devground.render;
 
+import com.devground.exception.GameException;
 import org.lwjgl.BufferUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
@@ -19,11 +22,9 @@ public class Texture {
     public Texture(String filename) {
         BufferedImage image;
         try {
-            File file = new File("./textures/"+filename);
-            if(!file.exists())
-                file = new File("./textures/unknown.png");
+            InputStream stream = getClass().getResourceAsStream("/resource/textures/"+filename);
 
-            image = ImageIO.read(file);
+            image = ImageIO.read(stream);
             width = image.getWidth();
             height = image.getHeight();
 

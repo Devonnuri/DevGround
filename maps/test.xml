@@ -1,4 +1,4 @@
-<world name="abc" width="100" height="100" fill="grass" scale="20">
+<world name="abc" width="50" height="50" fill="grass" scale="20">
     <tile x="2" y="2" material="stone" solid="false"/>
     <tile x="3" y="2" material="stone" solid="true"/>
     <tile x="4" y="2" material="stone" solid="false"/>

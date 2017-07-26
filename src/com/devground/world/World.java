@@ -45,7 +45,7 @@ public class World {
         try {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
         } catch (Exception e) {
-            throw new GameException("맵 \"%s\"를 로딩하는 중 오류가 발생하였습니다. (%s)", name, e.getClass().getName());
+            throw new GameException("맵(%s)을 로딩하는 중 오류가 발생하였습니다. (%s)", name, e.getClass().getName());
         }
 
         doc.getDocumentElement().normalize();
@@ -75,7 +75,6 @@ public class World {
             for(int i=0; i<nodeList.getLength(); i++) {
                 if(nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) nodeList.item(i);
-                    System.out.println(element.getNodeName());
                     String x = element.getAttribute("x");
                     String y = element.getAttribute("y");
                     String material = element.getAttribute("material");
@@ -103,7 +102,6 @@ public class World {
 
                 String x = (String) NullCheck.setDefault(element.getAttribute("x"), 0);
                 String y = (String) NullCheck.setDefault(element.getAttribute("y"), 0);
-                System.out.println(x+", "+y);
 
                 Transform transform = new Transform();
                 transform.pos.x = Integer.parseInt(x)*2;

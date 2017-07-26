@@ -1,12 +1,17 @@
 package com.devground.render;
 
+import com.devground.exception.GameException;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL20.*;
@@ -80,20 +85,20 @@ public class Shader {
         }
     }
 
+    public void setUniformVariable(String variable, Vector4f value) {
+        int location = glGetUniformLocation(program, variable);
+
+        if (location != 1) {
+            glUniform4f(location, value.x, value.y, value.z, value.w);
+        }
+    }
+
     public void bind() {
         glUseProgram(program);
     }
 
     private String readFile(String filename) {
-        String result = null;
-        try {
-            result = Files.readAllLines(
-                Paths.get("./shaders", filename)
-            ).stream().collect(Collectors.joining("\n"));
-        } catch(IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return result;
+        InputStream stream = getClass().getResourceAsStream("/resource/shaders/"+filename);
+        return new BufferedReader(new InputStreamReader(stream)).lines().collect(Collectors.joining("\n"));
     }
 }

@@ -4,11 +4,13 @@ import com.devground.Transform;
 import com.devground.Window;
 import com.devground.entity.Entity;
 import com.devground.entity.Player;
+import com.devground.gui.GUI;
 import com.devground.input.Input;
 import com.devground.render.Camera;
 import com.devground.render.Shader;
 import com.devground.utils.FPSCounter;
 import com.devground.utils.Timer;
+import com.devground.utils.Utils;
 import com.devground.world.Tile;
 import com.devground.world.TileRenderer;
 import com.devground.world.World;
@@ -40,6 +42,8 @@ public class Main implements Runnable {
 
     World world;
     TileRenderer tileRenderer;
+
+    GUI gui;
 
     Window window = new Window(width, height);
 
@@ -106,11 +110,13 @@ public class Main implements Runnable {
         camera.setPosition(new Vector3f(0, 0, 0));
         shader = new Shader("shader");
 
-        Entity.initModel();
+        Utils.initModel();
         world = new World("test", camera);
         world.calculateViewRange(window);
 
         tileRenderer = new TileRenderer(world);
+
+        gui = new GUI();
     }
 
     private void update() {
@@ -134,13 +140,14 @@ public class Main implements Runnable {
         glClear(GL_COLOR_BUFFER_BIT);
 
         world.render(tileRenderer, shader, camera);
+        gui.render(camera);
 
         window.swapBuffers();
         fpsCounter.update();
     }
 
     private void close() {
-        Entity.removeModel();
+        Utils.removeModel();
         glfwTerminate();
     }
 
