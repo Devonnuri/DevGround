@@ -7,5 +7,5 @@ uniform vec4 color;
 varying vec2 textureCoords;
 
 void main() {
-    gl_FragColor = color;
+    gl_FragColor = texture2D(sampler, textureCoords);
 }

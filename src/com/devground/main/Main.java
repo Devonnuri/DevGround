@@ -116,12 +116,13 @@ public class Main implements Runnable {
 
         tileRenderer = new TileRenderer(world);
 
-        gui = new GUI();
+        gui = new GUI(window);
     }
 
     private void update() {
         if(window.isResized()) {
             camera.setProjection(window.getWidth(), window.getHeight());
+            gui.correctCammera(window);
             world.calculateViewRange(window);
             glViewport(0, 0, window.getWidth(), window.getHeight());
         }
@@ -140,7 +141,7 @@ public class Main implements Runnable {
         glClear(GL_COLOR_BUFFER_BIT);
 
         world.render(tileRenderer, shader, camera);
-        gui.render(camera);
+        gui.render();
 
         window.swapBuffers();
         fpsCounter.update();

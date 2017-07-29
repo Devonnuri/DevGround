@@ -70,7 +70,7 @@ public class Shader {
     public void setUniformVariable(String variable, int value) {
         int location = glGetUniformLocation(program, variable);
 
-        if (location != 1) {
+        if (location != -1) {
             glUniform1i(location, value);
         }
     }
@@ -80,7 +80,7 @@ public class Shader {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         value.get(buffer);
 
-        if (location != 1) {
+        if (location != -1) {
             glUniformMatrix4fv(location, false, buffer);
         }
     }
@@ -88,7 +88,7 @@ public class Shader {
     public void setUniformVariable(String variable, Vector4f value) {
         int location = glGetUniformLocation(program, variable);
 
-        if (location != 1) {
+        if (location != -1) {
             glUniform4f(location, value.x, value.y, value.z, value.w);
         }
     }
