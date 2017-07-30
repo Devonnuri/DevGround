@@ -1,9 +1,6 @@
 package com.devground.main;
 
-import com.devground.Transform;
 import com.devground.Window;
-import com.devground.entity.Entity;
-import com.devground.entity.Player;
 import com.devground.gui.GUI;
 import com.devground.input.Input;
 import com.devground.render.Camera;
@@ -11,7 +8,6 @@ import com.devground.render.Shader;
 import com.devground.utils.FPSCounter;
 import com.devground.utils.Timer;
 import com.devground.utils.Utils;
-import com.devground.world.Tile;
 import com.devground.world.TileRenderer;
 import com.devground.world.World;
 import org.joml.Vector3f;
